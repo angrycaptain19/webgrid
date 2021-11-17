@@ -41,9 +41,9 @@ class TestAssertListEqual:
             testing.assert_list_equal([1, 2, 3], [2, 3, 1])
 
     def test_generators(self):
-        testing.assert_list_equal((x for x in range(3)), (x for x in range(3)))
-        testing.assert_list_equal((x for x in range(3)), [0, 1, 2])
-        testing.assert_list_equal([0, 1, 2], (x for x in range(3)))
+        testing.assert_list_equal(iter(range(3)), (x for x in range(3)))
+        testing.assert_list_equal(iter(range(3)), [0, 1, 2])
+        testing.assert_list_equal([0, 1, 2], iter(range(3)))
 
 
 class TestAssertRenderedXlsMatches:
@@ -61,11 +61,7 @@ class TestAssertRenderedXlsMatches:
         self.headers_written = True
 
     def set_values(self, values):
-        row_offset = 0
-
-        if self.headers_written:
-            row_offset = 1
-
+        row_offset = 1 if self.headers_written else 0
         for row_index, row in enumerate(values, start=row_offset):
             for col_index, value in enumerate(row):
                 self.sheet.write(row_index, col_index, value)
@@ -167,11 +163,7 @@ class TestAssertRenderedXlsxMatches:
         self.headers_written = len(headers)
 
     def set_values(self, values):
-        row_offset = 0
-
-        if self.headers_written:
-            row_offset = self.headers_written
-
+        row_offset = self.headers_written or 0
         for row_index, row in enumerate(values, start=row_offset):
             for col_index, value in enumerate(row):
                 self.sheet.write(row_index, col_index, value)

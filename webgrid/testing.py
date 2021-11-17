@@ -113,19 +113,13 @@ def query_to_str(statement, bind=None):
 
 
 def assert_in_query(obj, test_for):
-    if hasattr(obj, 'build_query'):
-        query = obj.build_query()
-    else:
-        query = obj
+    query = obj.build_query() if hasattr(obj, 'build_query') else obj
     query_str = query_to_str(query)
     assert test_for in query_str, query_str
 
 
 def assert_not_in_query(obj, test_for):
-    if hasattr(obj, 'build_query'):
-        query = obj.build_query()
-    else:
-        query = obj
+    query = obj.build_query() if hasattr(obj, 'build_query') else obj
     query_str = query_to_str(query)
     assert test_for not in query_str, query_str
 
@@ -443,10 +437,7 @@ class GridBase:
 
     def test_filters(self):
         """Use filters attribute/property/method to run assertions."""
-        if callable(self.filters):
-            cases = self.filters()
-        else:
-            cases = self.filters
+        cases = self.filters() if callable(self.filters) else self.filters
         for name, op, value, expected in cases:
             self.check_filter(name, op, value, expected)
 
