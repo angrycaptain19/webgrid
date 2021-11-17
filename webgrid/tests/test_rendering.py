@@ -194,11 +194,7 @@ def find_tag(html, tag, id_=None, class_=None, **attrs):
     if class_:
         selector += '.{}'.format(class_)
     for k, v in attrs.items():
-        if v is None:
-            selector += '[{}]'.format(k)
-        else:
-            selector += '[{}="{}"]'.format(k, v)
-
+        selector += '[{}]'.format(k) if v is None else '[{}="{}"]'.format(k, v)
     return PyQuery(html)(selector)
 
 
@@ -1279,9 +1275,7 @@ class TestCSVRenderer(object):
         csv_data.seek(0)
         byte_str = io.StringIO(csv_data.read().decode('utf-8'))
         reader = csv.reader(byte_str, delimiter=',', quotechar='"')
-        data = []
-        for row in reader:
-            data.append(row)
+        data = [row for row in reader]
         assert len(data[0]) == 9
         assert data[0][0] == 'First Name'
         assert data[0][2] == 'Active'
@@ -1298,13 +1292,12 @@ class TestCSVRenderer(object):
         csv_data.seek(0)
         byte_str = io.StringIO(csv_data.read().decode('utf-8'))
         reader = csv.reader(byte_str, delimiter=',', quotechar='"')
-        data = []
-        for row in reader:
-            data.append(row)
+        data = [row for row in reader]
         assert data[0][0] == 'Created'
         assert data[1][0] == '2016-08-10 01:02:03+0000'
 
     def test_it_renders_date_time_with_custom_format(self):
+
         class CSVGrid(Grid):
             session_on = True
             allowed_export_targets = {'csv': CSV}
@@ -1319,9 +1312,7 @@ class TestCSVRenderer(object):
         csv_data.seek(0)
         byte_str = io.StringIO(csv_data.read().decode('utf-8'))
         reader = csv.reader(byte_str, delimiter=',', quotechar='"')
-        data = []
-        for row in reader:
-            data.append(row)
+        data = [row for row in reader]
         assert data[0][0] == 'Created'
         assert data[1][0] == '08/10/2016 01:02 AM'
 

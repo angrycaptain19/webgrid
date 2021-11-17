@@ -34,10 +34,7 @@ def current_url(manager, root_only=False, host_only=False, strip_querystring=Fal
     elif host_only:
         retval = ro.host_url
     else:
-        if strip_querystring:
-            retval = ro.base_url
-        else:
-            retval = ro.url
+        retval = ro.base_url if strip_querystring else ro.url
     if strip_host:
         retval = retval.replace(ro.host_url.rstrip('/'), '', 1)
     if not strip_host and https is not None:

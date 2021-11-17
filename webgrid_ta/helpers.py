@@ -49,18 +49,12 @@ def eq_html(html, filename):
 
 
 def assert_in_query(obj, test_for):
-    if hasattr(obj, 'build_query'):
-        query = obj.build_query()
-    else:
-        query = obj
+    query = obj.build_query() if hasattr(obj, 'build_query') else obj
     query_str = query_to_str(query)
     assert test_for in query_str, query_str
 
 
 def assert_not_in_query(obj, test_for):
-    if hasattr(obj, 'build_query'):
-        query = obj.build_query()
-    else:
-        query = obj
+    query = obj.build_query() if hasattr(obj, 'build_query') else obj
     query_str = query_to_str(query)
     assert test_for not in query_str, query_str

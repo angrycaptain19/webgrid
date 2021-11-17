@@ -175,7 +175,7 @@ def one_to_none(f, _, args, kwargs):
     try:
         return f(*args, **kwargs)
     except NoResultFound as e:
-        if 'No row was found for one()' != str(e):
+        if str(e) != 'No row was found for one()':
             raise
         return None
 
@@ -199,10 +199,7 @@ class MethodsMixin(object):
 
     @classmethod
     def query(cls, *args):
-        if args:
-            entities = [getattr(cls, aname) for aname in args]
-        else:
-            entities = [cls]
+        entities = [getattr(cls, aname) for aname in args] if args else [cls]
         return cls._sa_sess().query(*entities)
 
     @transaction_classmethod
@@ -316,13 +313,10 @@ class MethodsMixin(object):
         key_field_name, value_field_name = fields.split(':')
         if _result is None:
             _result = cls.list(order_by)
-        retval = []
-        for obj in _result:
-            retval.append((
+        return [(
                 getattr(obj, key_field_name),
                 getattr(obj, value_field_name)
-            ))
-        return retval
+            ) for obj in _result]
 
     @classmethod
     def pairs_by(cls, fields, order_by=None, **kwargs):
@@ -332,8 +326,7 @@ class MethodsMixin(object):
     @classmethod
     def pairs_where(cls, fields, clause, *extra_clauses, **kwargs):
         result = cls.list_where(clause, *extra_clauses, **kwargs)
-        pairs = cls.pairs(fields, _result=result)
-        return pairs
+        return cls.pairs(fields, _result=result)
 
     @transaction_classmethod
     def delete(cls, oid):
@@ -368,9 +361,8 @@ class MethodsMixin(object):
 
     def to_dict(self, exclude=[]):
         col_prop_names = self.sa_column_names()
-        data = dict([(name, getattr(self, name))
+        return dict([(name, getattr(self, name))
                      for name in col_prop_names if name not in exclude])
-        return data
 
     def from_dict(self, data):
         """
@@ -481,12 +473,14 @@ class LookupMixin(DefaultMixin):
 
 
 def clear_db_postgresql():
-    sql = []
-    sql.append('DROP SCHEMA public cascade;')
-    sql.append('CREATE SCHEMA public AUTHORIZATION %s;' % db.engine.url.username)
-    sql.append('GRANT ALL ON SCHEMA public TO %s;' % db.engine.url.username)
-    sql.append('GRANT ALL ON SCHEMA public TO public;')
-    sql.append("COMMENT ON SCHEMA public IS 'standard public schema';")
+    sql = [
+        'DROP SCHEMA public cascade;',
+        'CREATE SCHEMA public AUTHORIZATION %s;' % db.engine.url.username,
+        'GRANT ALL ON SCHEMA public TO %s;' % db.engine.url.username,
+        'GRANT ALL ON SCHEMA public TO public;',
+        "COMMENT ON SCHEMA public IS 'standard public schema';",
+    ]
+
     for exstr in sql:
         try:
             db.engine.execute(exstr)

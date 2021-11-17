@@ -799,11 +799,10 @@ class TestQueryStringArgs(object):
             Column('LC2', Person.legacycol2)
 
             def query_base(self, has_sort, has_filters):
-                query = db.session.query(
+                return db.session.query(
                     Person.id, Person.firstname,
                     Person.legacycol1, Person.legacycol2
                 )
-                return query
 
         g = AGrid()
         g.apply_qs_args()
